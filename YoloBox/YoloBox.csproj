@@ -9,12 +9,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\add.png" />
+    <None Remove="Resources\addGray.png" />
     <None Remove="Resources\dataCleaning.png" />
     <None Remove="Resources\imageLabeling.png" />
     <None Remove="Resources\YoloBoxIconDarkTheme.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Resources\add.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\addGray.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\dataCleaning.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -7,18 +7,48 @@
         xmlns:converters="clr-namespace:YoloBox.Converters"
         xmlns:vwp="clr-namespace:WpfToolkit.Controls;assembly=VirtualizingWrapPanel"
         mc:Ignorable="d"
-        Title="DataCleaningWindow"
+        Title="YoloBox - Data Cleaning"
         Background="#202020"
-        Height="450" MinHeight="450" Width="800" MinWidth="800">
+        Height="550" MinHeight="550" Width="900" MinWidth="900">
 
     <Window.Resources>
         <converters:BooleanToRedGreenColorConverter x:Key="BooleanToRedGreenColorConverter" />
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverterInverted" Invert="True" />
     </Window.Resources>
     
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
-        <ListView ItemsSource="{Binding ImageList}"
+        <Menu Background="#353535" Foreground="White" Height="24">
+            <MenuItem Header="_File" Height="24">
+                <MenuItem Header="_Load Image Folder" Foreground="Black" Command="{Binding OpenImageFolderCommand}" />
+                <MenuItem Header="_Export Included Images" IsEnabled="{Binding IsFolderLoaded}" Foreground="Black" Command="{Binding ExportImagesCommand}" />
+                <MenuItem Header="_Return to Main Menu" Foreground="Black" Command="{Binding ReturnToMainMenuCommand}" />
+            </MenuItem>
+
+            <MenuItem Header="_Tools" Height="24">
+                <MenuItem Header="E_xclude All" IsEnabled="{Binding IsFolderLoaded}" Foreground="Black" Command="{Binding ExcludeAllCommand}" />
+            </MenuItem>
+        </Menu>
+
+        <Grid Grid.Row="1" Visibility="{Binding IsFolderLoaded, Converter={StaticResource BooleanToVisibilityConverterInverted}}" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Click or Drag to Load Image Folder" Foreground="#909090" HorizontalAlignment="Center" />
+            <Image Grid.Row="1" Source="/Resources/addGray.png" Margin="10" Height="100" />
+        </Grid>
+        
+        <ListView Grid.Row="1" ItemsSource="{Binding ImageList}"
                   Background="Transparent"
+                  BorderThickness="0"
                   ScrollViewer.CanContentScroll="True"
                   VirtualizingPanel.IsVirtualizing="True"
                   VirtualizingPanel.ScrollUnit="Pixel"
@@ -40,7 +70,7 @@
             </ListView.ItemContainerStyle>
             <ListView.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <vwp:VirtualizingWrapPanel/>
+                    <vwp:VirtualizingWrapPanel SpacingMode="StartAndEndOnly"/>
                 </ItemsPanelTemplate>
             </ListView.ItemsPanel>
             <ListView.ItemTemplate>
@@ -49,12 +79,36 @@
                         <Border.InputBindings>
                             <MouseBinding MouseAction="RightClick" Command="{Binding ToggleIncludedCommand}" />
                         </Border.InputBindings>
-                        <Image Source="{Binding Image}" Width="400" Stretch="Uniform"/>
+                        <Grid>
+
+
+                            <Image Source="{Binding Image}" Width="400" Stretch="Uniform"/>
+
+                        </Grid>
                     </Border>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
 
-        <Button Content="Load Image Folder" Command="{Binding OpenImageFolderCommand}" HorizontalAlignment="Left" VerticalAlignment="Top" />
+        <Grid Grid.Row="2" Height="40" Background="#282828">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="Total Images:" Foreground="White" Margin="15 0 5 0" />
+                <TextBlock Text="{Binding TotalImages}" Foreground="White" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="Loaded Folder:" Foreground="White" Margin="0 0 5 0" />
+                <TextBlock Grid.Column="1" Text="{Binding CurrentFolderPath}" Foreground="White" />
+            </StackPanel>
+
+            <Button Grid.Column="2" Content="Export Included Images" IsEnabled="{Binding IsFolderLoaded}" Margin="5 0" Command="{Binding ExportImagesCommand}" />
+
+        </Grid>
     </Grid>
 </Window>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +17,7 @@ namespace YoloBox.ViewModels
 
         public ICommand OpenDataCleaningCommand { get; }
         public ICommand OpenImageLabelingCommand { get; }
+        public ICommand OpenIcons8ReferenceCommand { get; }
 
         public MainWindowViewModel(Window mainWindow)
         {
@@ -23,6 +25,7 @@ namespace YoloBox.ViewModels
 
             OpenDataCleaningCommand = new RelayCommand(_ => OpenDataCleaningWindow());
             OpenImageLabelingCommand = new RelayCommand(_ => OpenImageLabelingWindow());
+            OpenIcons8ReferenceCommand = new RelayCommand(param => OpenIcons8Reference(param?.ToString()));
         }
 
         private void OpenDataCleaningWindow()
@@ -37,6 +40,11 @@ namespace YoloBox.ViewModels
             var window = new ImageLabelingWindow();
             window.Show();
             _mainWindow.Close();
+        }
+
+        private void OpenIcons8Reference(string url)
+        {
+            Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
         }
     }
 }

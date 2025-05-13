@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -14,18 +16,57 @@ using YoloBox.Models;
 
 namespace YoloBox.ViewModels
 {
-    public class DataCleaningViewModel
+    public class DataCleaningViewModel : INotifyPropertyChanged
     {
         private readonly Window _dataCleaningWindow;
 
         public ICommand OpenImageFolderCommand { get; }
         public ICommand ReturnToMainMenuCommand { get; }
         public ICommand ExcludeAllCommand { get; }
-
         public ICommand ExportImagesCommand { get; }
 
-        public string CurrentFolderPath { get; set; }
-        public int TotalImages { get; set; }
+        private string _currentFolderPath = "None";
+        public string CurrentFolderPath
+        {
+            get => _currentFolderPath;
+            set
+            {
+                if (_currentFolderPath != value)
+                {
+                    _currentFolderPath = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private int _totalImages;
+        public int TotalImages
+        {
+            get => _totalImages;
+            set
+            {
+                if (_totalImages != value)
+                {
+                    _totalImages = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _isFolderLoaded;
+        public bool IsFolderLoaded
+        {
+            get => _isFolderLoaded;
+            set
+            {
+                if (_isFolderLoaded != value)
+                {
+                    _isFolderLoaded = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public ObservableCollection<DataCleaningImage> ImageList { get; set; } = new ObservableCollection<DataCleaningImage>();
 
         public DataCleaningViewModel(Window dataCleaningWindow)
@@ -34,6 +75,7 @@ namespace YoloBox.ViewModels
 
             ReturnToMainMenuCommand = new RelayCommand(_ => ReturnToMainMenu());
             OpenImageFolderCommand = new RelayCommand(_ => OpenImageFolder());
+            ExcludeAllCommand = new RelayCommand(_ => ExcludeAllImages());
         }
 
         private void OpenImageFolder()
@@ -48,6 +90,7 @@ namespace YoloBox.ViewModels
             else
             {
                 MessageBox.Show("Unable to open folder! Please try again.", "Open Image Folder", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
             }
 
             LoadAllImages();
@@ -68,6 +111,17 @@ namespace YoloBox.ViewModels
             {
                 ImageList.Add(new DataCleaningImage(imagePath));
             }
+
+            IsFolderLoaded = true;
+            TotalImages = ImageList.Count;
+        }
+
+        private void ExcludeAllImages()
+        {
+            foreach (DataCleaningImage image in ImageList)
+            {
+                image.IsIncluded = false;
+            }
         }
 
         private void ReturnToMainMenu()
@@ -75,6 +129,12 @@ namespace YoloBox.ViewModels
             var window = new MainWindow();
             window.Show();
             _dataCleaningWindow.Close();
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

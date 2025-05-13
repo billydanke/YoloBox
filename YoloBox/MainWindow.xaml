@@ -52,6 +52,11 @@
 
         <Image Height="100" Source="/Resources/YoloBoxIconDarkTheme.png" Margin="5 10" HorizontalAlignment="Left" VerticalAlignment="Top" />
 
+        <TextBlock VerticalAlignment="Top" HorizontalAlignment="Right" Foreground="#909090" Margin="5">
+            Icons by
+            <Hyperlink Command="{Binding OpenIcons8ReferenceCommand}" CommandParameter="https://www.icons8.com" Foreground="#909090">Icons8</Hyperlink>
+        </TextBlock>
+
         <Grid Grid.Row="1" Margin="6 0 6 6">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />

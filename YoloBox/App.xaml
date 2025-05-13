@@ -4,6 +4,31 @@
              xmlns:local="clr-namespace:YoloBox"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <Style TargetType="ScrollBar">
+            <Setter Property="Background" Value="#303030"/>
+            <Setter Property="Foreground" Value="#888888"/>
+            <Setter Property="Width" Value="15"/>
+            <Setter Property="MinWidth" Value="10" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid Background="{TemplateBinding Background}">
+                            <Track Name="PART_Track" IsDirectionReversed="true" Width="12">
+                                <Track.Thumb>
+                                    <Thumb Background="White" BorderBrush="#404040" BorderThickness="1"/>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#404040" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Padding" Value="10 0" />
+        </Style>
     </Application.Resources>
 </Application>
