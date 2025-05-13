@@ -4,65 +4,56 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:YoloBox.Models"
-        xmlns:components="clr-namespace:YoloBox.Components"
         xmlns:converters="clr-namespace:YoloBox.Converters"
+        xmlns:vwp="clr-namespace:WpfToolkit.Controls;assembly=VirtualizingWrapPanel"
         mc:Ignorable="d"
         Title="DataCleaningWindow"
         Background="#202020"
         Height="450" MinHeight="450" Width="800" MinWidth="800">
 
     <Window.Resources>
-        <converters:WidthToItemWidthConverter x:Key="WidthToItemWidthConverter" />
+        <converters:BooleanToRedGreenColorConverter x:Key="BooleanToRedGreenColorConverter" />
     </Window.Resources>
     
     <Grid>
 
-        <ListBox ItemsSource="{Binding ImageList}" 
-         SelectionMode="Extended" 
-         ScrollViewer.CanContentScroll="True" 
-         BorderThickness="0"
-         Background="Transparent">
-            <ListBox.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <UniformGrid Columns="4"/>
-                </ItemsPanelTemplate>
-            </ListBox.ItemsPanel>
-
-            <ListBox.ItemContainerStyle>
-                <Style TargetType="ListBoxItem">
-                    <Setter Property="Focusable" Value="False"/>
-                    <Setter Property="IsHitTestVisible" Value="True"/>
-                    <Setter Property="IsSelected" Value="False"/>
-                    <Setter Property="Background" Value="Transparent"/>
-                    <Setter Property="BorderThickness" Value="0"/>
-                    <Setter Property="OverridesDefaultStyle" Value="True"/>
+        <ListView ItemsSource="{Binding ImageList}"
+                  Background="Transparent"
+                  ScrollViewer.CanContentScroll="True"
+                  VirtualizingPanel.IsVirtualizing="True"
+                  VirtualizingPanel.ScrollUnit="Pixel"
+                  VirtualizingPanel.VirtualizationMode="Recycling">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Focusable" Value="False" />
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="BorderBrush" Value="Transparent" />
+                    <Setter Property="OverridesDefaultStyle" Value="True" />
                     <Setter Property="Template">
                         <Setter.Value>
-                            <ControlTemplate TargetType="ListBoxItem">
-                                <ContentPresenter/>
+                            <ControlTemplate TargetType="ListViewItem">
+                                <ContentPresenter />
                             </ControlTemplate>
                         </Setter.Value>
                     </Setter>
                 </Style>
-            </ListBox.ItemContainerStyle>
-
-            <ListBox.ItemTemplate>
-                <DataTemplate DataType="{x:Type local:DataCleaningImage}">
-                    <Border BorderBrush="Gray" BorderThickness="1" Margin="4" CornerRadius="8" Background="#303030">
-                        <StackPanel>
-                            <Image Source="{Binding Image}"
-                           Height="120"
-                           Stretch="UniformToFill"
-                           Margin="4"/>
-                            <CheckBox Content="Include"
-                              IsChecked="{Binding IsIncluded, Mode=TwoWay}"
-                              HorizontalAlignment="Center"
-                              Margin="0,0,0,4"/>
-                        </StackPanel>
+            </ListView.ItemContainerStyle>
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <vwp:VirtualizingWrapPanel/>
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Border BorderBrush="{Binding IsIncluded, Converter={StaticResource BooleanToRedGreenColorConverter}}" Background="#404040" BorderThickness="3" Margin="3" CornerRadius="10" Padding="5">
+                        <Border.InputBindings>
+                            <MouseBinding MouseAction="RightClick" Command="{Binding ToggleIncludedCommand}" />
+                        </Border.InputBindings>
+                        <Image Source="{Binding Image}" Width="400" Stretch="Uniform"/>
                     </Border>
                 </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+            </ListView.ItemTemplate>
+        </ListView>
 
         <Button Content="Load Image Folder" Command="{Binding OpenImageFolderCommand}" HorizontalAlignment="Left" VerticalAlignment="Top" />
     </Grid>
