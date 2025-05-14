@@ -13,6 +13,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using YoloBox.Classes;
 using YoloBox.Models;
+using YoloBox.Views;
 
 namespace YoloBox.ViewModels
 {
@@ -92,6 +93,7 @@ namespace YoloBox.ViewModels
             OpenImageFolderCommand = new RelayCommand(_ => OpenImageFolder());
             ExcludeAllCommand = new RelayCommand(_ => ExcludeAllImages());
             IncludeAllCommand = new RelayCommand(_ => IncludeAllImages());
+            ExportImagesCommand = new RelayCommand(_ => ExportIncudedImages());
         }
 
         private void OpenImageFolder()
@@ -162,6 +164,12 @@ namespace YoloBox.ViewModels
             {
                 image.IsIncluded = true;
             }
+        }
+
+        private void ExportIncudedImages()
+        {
+            var window = new DataExportWindow(ImageList, CurrentFolderPath);
+            window.ShowDialog();
         }
 
         private void ReturnToMainMenu()

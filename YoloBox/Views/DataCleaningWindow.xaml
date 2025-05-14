@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         Title="YoloBox - Data Cleaning"
         Background="#202020"
-        Height="550" MinHeight="550" Width="900" MinWidth="900">
+        Height="550" MinHeight="550" Width="900" MinWidth="900" WindowState="Maximized">
 
     <Window.Resources>
         <converters:BooleanToRedGreenColorConverter x:Key="BooleanToRedGreenColorConverter" />
