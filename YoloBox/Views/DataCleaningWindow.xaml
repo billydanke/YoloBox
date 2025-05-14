@@ -33,6 +33,7 @@
 
             <MenuItem Header="_Tools" Height="24">
                 <MenuItem Header="E_xclude All" IsEnabled="{Binding IsFolderLoaded}" Foreground="Black" Command="{Binding ExcludeAllCommand}" />
+                <MenuItem Header="_Include All" IsEnabled="{Binding IsFolderLoaded}" Foreground="Black" Command="{Binding IncludeAllCommand}" />
             </MenuItem>
         </Menu>
 
@@ -42,13 +43,18 @@
                 <RowDefinition />
             </Grid.RowDefinitions>
 
-            <TextBlock Text="Click or Drag to Load Image Folder" Foreground="#909090" HorizontalAlignment="Center" />
+            <Grid.InputBindings>
+                <MouseBinding Gesture="LeftClick" Command="{Binding OpenImageFolderCommand}" />
+            </Grid.InputBindings>
+
+            <TextBlock Text="Click to Load Image Folder" Foreground="#909090" HorizontalAlignment="Center" />
             <Image Grid.Row="1" Source="/Resources/addGray.png" Margin="10" Height="100" />
         </Grid>
         
         <ListView Grid.Row="1" ItemsSource="{Binding ImageList}"
                   Background="Transparent"
                   BorderThickness="0"
+                  Visibility="{Binding IsFolderLoaded, Converter={StaticResource BooleanToVisibilityConverter}}"
                   ScrollViewer.CanContentScroll="True"
                   VirtualizingPanel.IsVirtualizing="True"
                   VirtualizingPanel.ScrollUnit="Pixel"
@@ -75,15 +81,12 @@
             </ListView.ItemsPanel>
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Border BorderBrush="{Binding IsIncluded, Converter={StaticResource BooleanToRedGreenColorConverter}}" Background="#404040" BorderThickness="3" Margin="3" CornerRadius="10" Padding="5">
+                    <Border BorderBrush="{Binding IsIncluded, Converter={StaticResource BooleanToRedGreenColorConverter}}" Background="Transparent" BorderThickness="3" Margin="3" CornerRadius="10" Padding="5">
                         <Border.InputBindings>
                             <MouseBinding MouseAction="RightClick" Command="{Binding ToggleIncludedCommand}" />
                         </Border.InputBindings>
                         <Grid>
-
-
                             <Image Source="{Binding Image}" Width="400" Stretch="Uniform"/>
-
                         </Grid>
                     </Border>
                 </DataTemplate>
@@ -100,6 +103,9 @@
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                 <TextBlock Text="Total Images:" Foreground="White" Margin="15 0 5 0" />
                 <TextBlock Text="{Binding TotalImages}" Foreground="White" />
+
+                <TextBlock Text="Included Images:" Foreground="White" Margin="15 0 5 0" />
+                <TextBlock Text="{Binding TotalIncludedImages}" Foreground="White" />
             </StackPanel>
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
@@ -107,7 +113,7 @@
                 <TextBlock Grid.Column="1" Text="{Binding CurrentFolderPath}" Foreground="White" />
             </StackPanel>
 
-            <Button Grid.Column="2" Content="Export Included Images" IsEnabled="{Binding IsFolderLoaded}" Margin="5 0" Command="{Binding ExportImagesCommand}" />
+            <Button Grid.Column="2" Content="_Export Included Images" IsEnabled="{Binding IsFolderLoaded}" Margin="5 0" Command="{Binding ExportImagesCommand}" />
 
         </Grid>
     </Grid>

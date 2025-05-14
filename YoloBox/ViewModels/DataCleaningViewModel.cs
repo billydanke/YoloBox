@@ -23,6 +23,7 @@ namespace YoloBox.ViewModels
         public ICommand OpenImageFolderCommand { get; }
         public ICommand ReturnToMainMenuCommand { get; }
         public ICommand ExcludeAllCommand { get; }
+        public ICommand IncludeAllCommand { get; }
         public ICommand ExportImagesCommand { get; }
 
         private string _currentFolderPath = "None";
@@ -53,6 +54,20 @@ namespace YoloBox.ViewModels
             }
         }
 
+        private int _totalIncludedImages;
+        public int TotalIncludedImages
+        {
+            get => _totalIncludedImages;
+            set
+            {
+                if(_totalIncludedImages != value)
+                {
+                    _totalIncludedImages = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private bool _isFolderLoaded;
         public bool IsFolderLoaded
         {
@@ -76,6 +91,7 @@ namespace YoloBox.ViewModels
             ReturnToMainMenuCommand = new RelayCommand(_ => ReturnToMainMenu());
             OpenImageFolderCommand = new RelayCommand(_ => OpenImageFolder());
             ExcludeAllCommand = new RelayCommand(_ => ExcludeAllImages());
+            IncludeAllCommand = new RelayCommand(_ => IncludeAllImages());
         }
 
         private void OpenImageFolder()
@@ -109,11 +125,27 @@ namespace YoloBox.ViewModels
             ImageList.Clear();
             foreach(string imagePath in imagePaths)
             {
-                ImageList.Add(new DataCleaningImage(imagePath));
+                DataCleaningImage image = new DataCleaningImage(imagePath);
+                image.PropertyChanged += DataCleaningImage_PropertyChanged;
+                ImageList.Add(image);
             }
 
             IsFolderLoaded = true;
             TotalImages = ImageList.Count;
+            TotalIncludedImages = ImageList.Count;
+        }
+
+        private void DataCleaningImage_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(DataCleaningImage.IsIncluded))
+            {
+                DataCleaningImage? image = sender as DataCleaningImage;
+                if(image != null)
+                {
+                    if (image.IsIncluded) TotalIncludedImages++;
+                    else TotalIncludedImages--;
+                }
+            }
         }
 
         private void ExcludeAllImages()
@@ -121,6 +153,14 @@ namespace YoloBox.ViewModels
             foreach (DataCleaningImage image in ImageList)
             {
                 image.IsIncluded = false;
+            }
+        }
+
+        private void IncludeAllImages()
+        {
+            foreach (DataCleaningImage image in ImageList)
+            {
+                image.IsIncluded = true;
             }
         }
 
