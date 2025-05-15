@@ -57,5 +57,30 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style TargetType="ProgressBar">
+            <Setter Property="Foreground" Value="#60C060"/>
+            <Setter Property="Background" Value="#404040"/>
+            <Setter Property="BorderBrush" Value="#50ffffff" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Height" Value="20"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ProgressBar">
+                        <Grid x:Name="TemplateRoot" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+                            <Border x:Name="PART_Track" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4" VerticalAlignment="Stretch" />
+                            <Border x:Name="PART_Indicator" Background="{TemplateBinding Foreground}" CornerRadius="4" Width="0" HorizontalAlignment="Left" VerticalAlignment="Stretch" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="#606060"/>
+                                <Setter Property="Background" Value="#303030"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
     </Application.Resources>
 </Application>

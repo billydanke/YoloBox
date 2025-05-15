@@ -27,5 +27,10 @@ namespace YoloBox.Views
             InitializeComponent();
             DataContext = new DataExportViewModel(this, imageList, currentFolderPath);
         }
+
+        private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = !e.Text.All(char.IsDigit);
+        }
     }
 }

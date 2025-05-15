@@ -13,6 +13,7 @@
     <None Remove="Resources\addGray.png" />
     <None Remove="Resources\dataCleaning.png" />
     <None Remove="Resources\imageLabeling.png" />
+    <None Remove="Resources\openFolder.png" />
     <None Remove="Resources\YoloBoxIconDarkTheme.png" />
   </ItemGroup>
 
@@ -27,6 +28,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\imageLabeling.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\openFolder.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\YoloBoxIconDarkTheme.png">
