@@ -4,9 +4,172 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:YoloBox.Views"
+        xmlns:converters="clr-namespace:YoloBox.Converters"
         mc:Ignorable="d"
-        Title="ImageLabelingWindow" Height="450" Width="800">
+        Title="YoloBox - Image Labeling"
+        Background="#202020"
+        Height="550" MinHeight="550" Width="900" MinWidth="900" WindowState="Maximized">
+
+    <Window.Resources>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Window.Resources>
+    
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="350" MinWidth="250" MaxWidth="400" />
+            <ColumnDefinition />
+            <ColumnDefinition Width="350" MinWidth="250" MaxWidth="400" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" MinHeight="100" />
+            <RowDefinition Height="2*" MinHeight="100" />
+            <RowDefinition Height="Auto" MinHeight="40" />
+        </Grid.RowDefinitions>
+
+        <Menu Grid.ColumnSpan="3" Background="#353535" Foreground="White" Height="24" BorderBrush="Gray">
+            <MenuItem Header="_File" Height="24">
+                <MenuItem Header="Load _Image Folder" Foreground="Black" Command="{Binding OpenImageFolderCommand}" />
+                <MenuItem Header="Set _Label Folder" Foreground="Black" Command="{Binding SetLabelFolderCommand}" />
+                <MenuItem Header="_Return to Main Menu" Foreground="Black" Command="{Binding ReturnToMainMenuCommand}" />
+            </MenuItem>
+        </Menu>
+
+        <Image Grid.Column="1" Grid.Row="1" Grid.RowSpan="2" Margin="10" Stretch="Uniform" Source="{Binding SelectedLabelImage.Image}" />
+
+        <Border Grid.Row="1" Grid.RowSpan="2" Background="#303030" BorderBrush="Gray" BorderThickness="1 1 1 0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <Border Background="#202020">
+                    <TextBlock Text="Image List" Foreground="White" HorizontalAlignment="Center" Padding="5" FontWeight="SemiBold" />
+                </Border>
+
+                <ListBox Grid.Row="1" ItemsSource="{Binding ImageList}" SelectedItem="{Binding SelectedLabelImage, Mode=TwoWay}" BorderThickness="0" Background="Transparent" Foreground="White" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border HorizontalAlignment="Stretch">
+                                <Grid Margin="5 1" HorizontalAlignment="Stretch">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Text="{Binding ImageName}" VerticalAlignment="Center" />
+                                    <Image Grid.Column="1" Source="/Resources/seen.png" Height="16" Margin="10 0 0 0" VerticalAlignment="Center" HorizontalAlignment="Right" Visibility="{Binding IsSeen, Converter={StaticResource BooleanToVisibilityConverter}}" ToolTip="Seen" />
+
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+            </Grid>
+        </Border>
+        <GridSplitter Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" Width="5" HorizontalAlignment="Right" VerticalAlignment="Stretch" Background="Transparent" />
+
+        <Border Grid.Column="2" Grid.Row="1" Background="#303030" BorderBrush="Gray" BorderThickness="1 1 1 0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <Border Background="#202020">
+                    <TextBlock Text="Classes" Foreground="White" HorizontalAlignment="Center" Padding="5" FontWeight="SemiBold" />
+                </Border>
+
+            </Grid>
+        </Border>
+
+        <Border Grid.Column="2" Grid.Row="2" Background="#303030" BorderBrush="Gray" BorderThickness="1 1 1 0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <Border Background="#202020">
+                    <TextBlock Text="Labels" Foreground="White" HorizontalAlignment="Center" Padding="5" FontWeight="SemiBold" />
+                </Border>
+
+                <ListBox Grid.Row="1" ItemsSource="{Binding Labels}" BorderThickness="0" Background="Transparent" SelectionMode="Single" ScrollViewer.CanContentScroll="False">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="#252525" Padding="5" CornerRadius="6">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="5"/>
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Rectangle Grid.Column="0" Fill="{Binding Class.Brush}" RadiusX="2" RadiusY="2">
+                                        <Rectangle.Effect>
+                                            <DropShadowEffect Color="{Binding Class.Brush.Color}" BlurRadius="10" ShadowDepth="0" Opacity="0.25" />
+                                        </Rectangle.Effect>
+                                    </Rectangle>
+
+                                    <Grid Grid.Column="1" x:Name="ContentGrid" Background="Transparent">
+                                        
+                                        <StackPanel Margin="10 0 0 0">
+                                            <TextBlock Text="{Binding ClassName}" Foreground="White" FontWeight="Bold"/>
+                                            <TextBlock Foreground="Gray" FontSize="12" TextTrimming="CharacterEllipsis">
+                                                <TextBlock.Text>
+                                                    <MultiBinding StringFormat="{}(X: {0:0.##}, Y: {1:0.##}, W: {2:0.##}, H: {3:0.##})">
+                                                        <Binding Path="CenterX"/>
+                                                        <Binding Path="CenterY"/>
+                                                        <Binding Path="Width"/>
+                                                        <Binding Path="Height"/>
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                        </StackPanel>
+
+                                        <Button Content="✖" Foreground="White" Width="20" Height="20" VerticalAlignment="Center" HorizontalAlignment="Right" Background="Transparent" BorderBrush="{x:Null}" Command="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.DeleteLabelCommand}" CommandParameter="{Binding}" Panel.ZIndex="1" >
+                                            <Button.Style>
+                                                <Style TargetType="Button">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsMouseOver, ElementName=ContentGrid}" Value="True">
+                                                            <Setter Property="Visibility" Value="Visible"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                        
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+            </Grid>
+        </Border>
+
+        <GridSplitter Grid.Row="2" Grid.Column="2" Height="5" VerticalAlignment="Top" HorizontalAlignment="Stretch" Background="Transparent" ResizeDirection="Rows" ResizeBehavior="PreviousAndCurrent" />
+        <GridSplitter Grid.Column="2" Grid.Row="1" Grid.RowSpan="2" Width="5" HorizontalAlignment="Left" VerticalAlignment="Stretch" Background="Transparent" />
+        
+        <Border Grid.Row="3" Grid.ColumnSpan="3" Background="#353535" BorderBrush="Gray" BorderThickness="1" MinHeight="40">
+            <Grid Height="40">
+                
+            </Grid>
+        </Border>
         
     </Grid>
 </Window>
