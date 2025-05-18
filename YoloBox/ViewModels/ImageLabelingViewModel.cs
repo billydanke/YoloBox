@@ -26,7 +26,10 @@ namespace YoloBox.ViewModels
         public ICommand SetLabelFolderCommand { get; }
         public ICommand ReturnToMainMenuCommand { get; }
         public ICommand AddNewClassCommand { get; }
+        public ICommand EditClassCommand { get; }
         public ICommand DeleteLabelCommand { get; }
+        public ICommand PreviousImageCommand { get; }
+        public ICommand NextImageCommand { get; }
 
         private string _currentImageFolderPath = "None";
         public string CurrentImageFolderPath
@@ -51,6 +54,20 @@ namespace YoloBox.ViewModels
                 if (_currentLabelFolderPath != value)
                 {
                     _currentLabelFolderPath = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private Class _selectedClass;
+        public Class SelectedClass
+        {
+            get => _selectedClass;
+            set
+            {
+                if (_selectedClass != value)
+                {
+                    _selectedClass = value;
                     OnPropertyChanged();
                 }
             }
@@ -108,6 +125,7 @@ namespace YoloBox.ViewModels
             SetLabelFolderCommand = new RelayCommand(_ => SetLabelFolder());
             ReturnToMainMenuCommand = new RelayCommand(_ => ReturnToMainMenu());
             AddNewClassCommand = new RelayCommand(_ => AddNewClass());
+            EditClassCommand = new RelayCommand<Class>(classModel => EditClass(classModel));
             DeleteLabelCommand = new RelayCommand<Label>(label =>
             {
                 if (label != null && Labels.Contains(label))
@@ -115,6 +133,8 @@ namespace YoloBox.ViewModels
                     Labels.Remove(label);
                 }
             });
+            NextImageCommand = new RelayCommand(_ => GoToNextImage());
+            PreviousImageCommand = new RelayCommand(_ => GoToPreviousImage());
         }
 
         private void OpenImageFolder()
@@ -153,6 +173,12 @@ namespace YoloBox.ViewModels
                 {
                     SetLabelFolder();
                 }
+            }
+
+            // Load the first image in the list automatically
+            if(ImageList.Any())
+            {
+                SelectedLabelImage = ImageList.First();
             }
         }
 
@@ -265,7 +291,40 @@ namespace YoloBox.ViewModels
 
         private void AddNewClass(int classId = -1)
         {
+            if(string.IsNullOrEmpty(CurrentLabelFolderPath))
+            {
+                MessageBox.Show("Unable to add new class, label folder is not set! Please set a label destination folder to continue.", "Failed to Add Class", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
 
+            var window = new AddClassWindow(CurrentLabelFolderPath, Classes, classId);
+            window.ShowDialog();
+        }
+
+        private void EditClass(Class? classModel)
+        {
+            if (classModel != null)
+            {
+                AddNewClass(classModel.ClassId);
+            }
+        }
+
+        private void GoToNextImage()
+        {
+            int index = ImageList.IndexOf(SelectedLabelImage);
+            if(index >= 0 && index < ImageList.Count - 1)
+            {
+                SelectedLabelImage = ImageList[index + 1];
+            }
+        }
+
+        private void GoToPreviousImage()
+        {
+            int index = ImageList.IndexOf(SelectedLabelImage);
+            if (index > 0)
+            {
+                SelectedLabelImage = ImageList[index - 1];
+            }
         }
 
         private void ReturnToMainMenu()

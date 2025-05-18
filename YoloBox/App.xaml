@@ -37,6 +37,46 @@
             </Setter>
         </Style>
 
+        <Style TargetType="Slider">
+            <Setter Property="Foreground" Value="#909090"/>
+            <Setter Property="Background" Value="#606060"/>
+            <Setter Property="Width" Value="24"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Slider">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <Border Grid.Row="0" Background="#202020" Width="6" HorizontalAlignment="Center" CornerRadius="3"/>
+
+                            <!-- Slider logic -->
+                            <Track x:Name="PART_Track" Grid.Row="0" Orientation="Vertical" IsDirectionReversed="False">
+                                <Track.Thumb>
+                                    <Thumb Background="#909090" BorderBrush="#444444" BorderThickness="1" Width="14" Height="14" VerticalAlignment="Center">
+                                        <Thumb.Style>
+                                            <Style TargetType="Thumb">
+                                                <Setter Property="OverridesDefaultStyle" Value="True" />
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Thumb">
+                                                            <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="1" />
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Thumb.Style>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style TargetType="Button">
             <Setter Property="Background" Value="#404040" />
             <Setter Property="Foreground" Value="White" />

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
 
 namespace YoloBox.Models
 {
@@ -70,6 +71,15 @@ namespace YoloBox.Models
         }
 
         public SolidColorBrush Brush => new SolidColorBrush(Color);
+        public SolidColorBrush HoverBrush => new SolidColorBrush(Color.FromArgb(50, Color.R, Color.G, Color.B));
+
+        public Effect GlowEffect => new DropShadowEffect
+        {
+            Color = Color,
+            BlurRadius = 10,
+            ShadowDepth = 0,
+            Opacity = 0.25
+        };
 
         public Class(int classId, string name, Color color)
         {

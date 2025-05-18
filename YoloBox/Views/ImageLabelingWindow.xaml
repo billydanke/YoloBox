@@ -13,6 +13,11 @@
     <Window.Resources>
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Window.Resources>
+
+    <Window.InputBindings>
+        <KeyBinding Key="A" Command="{Binding PreviousImageCommand}" />
+        <KeyBinding Key="D" Command="{Binding NextImageCommand}" />
+    </Window.InputBindings>
     
     <Grid>
         <Grid.ColumnDefinitions>
@@ -84,8 +89,68 @@
                 </Grid.RowDefinitions>
 
                 <Border Background="#202020">
-                    <TextBlock Text="Classes" Foreground="White" HorizontalAlignment="Center" Padding="5" FontWeight="SemiBold" />
+                    <Grid>
+                        <TextBlock Text="Classes" Foreground="White" HorizontalAlignment="Center" Padding="5" FontWeight="SemiBold" />
+                        <Button Content="✚ New Class" Height="Auto" Padding="6 0" Margin="2" HorizontalAlignment="Right" Background="Transparent" Command="{Binding AddNewClassCommand}" />
+                    </Grid>
                 </Border>
+
+                <ListBox Grid.Row="1" ItemsSource="{Binding Classes}" SelectedItem="{Binding SelectedClass, Mode=TwoWay}" Margin="5 3" HorizontalContentAlignment="Center" BorderThickness="0" Background="Transparent" FocusVisualStyle="{x:Null}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" SelectionMode="Single">
+
+                    <ListBox.Resources>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                            <Setter Property="BorderThickness" Value="0" />
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="Padding" Value="0" />
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="VerticalContentAlignment" Value="Center" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border Background="Transparent">
+                                            <ContentPresenter />
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.Resources>
+                    
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel IsItemsHost="True" HorizontalAlignment="Center" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border x:Name="TagBorder" CornerRadius="6" Margin="1" Padding="10 6" MinWidth="50" BorderThickness="2" BorderBrush="{Binding Brush}" Background="Transparent">
+                                <Border.InputBindings>
+                                    <MouseBinding Gesture="RightClick" Command="{Binding DataContext.EditClassCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" />
+                                </Border.InputBindings>
+                                
+                                <TextBlock x:Name="TagText" Text="{Binding Name}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{Binding Brush}" FontWeight="SemiBold">
+                                    <TextBlock.Effect>
+                                        <DropShadowEffect Color="Black" BlurRadius="4" ShadowDepth="0" Opacity="1" />
+                                    </TextBlock.Effect>
+                                </TextBlock>
+                            </Border>
+
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                                    <Setter TargetName="TagBorder" Property="Background" Value="{Binding HoverBrush}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                                    <Setter TargetName="TagBorder" Property="Background" Value="{Binding Brush}" />
+                                    <Setter TargetName="TagBorder" Property="BorderThickness" Value="0" />
+                                    <Setter TargetName="TagBorder" Property="Padding" Value="12 8" />
+                                    <Setter TargetName="TagText" Property="Foreground" Value="White" />
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
 
             </Grid>
         </Border>
@@ -117,11 +182,7 @@
                                         <ColumnDefinition />
                                     </Grid.ColumnDefinitions>
 
-                                    <Rectangle Grid.Column="0" Fill="{Binding Class.Brush}" RadiusX="2" RadiusY="2">
-                                        <Rectangle.Effect>
-                                            <DropShadowEffect Color="{Binding Class.Brush.Color}" BlurRadius="10" ShadowDepth="0" Opacity="0.25" />
-                                        </Rectangle.Effect>
-                                    </Rectangle>
+                                    <Rectangle Grid.Column="0" Fill="{Binding Class.Brush}" RadiusX="2" RadiusY="2" Effect="{Binding Class.GlowEffect}" />
 
                                     <Grid Grid.Column="1" x:Name="ContentGrid" Background="Transparent">
                                         

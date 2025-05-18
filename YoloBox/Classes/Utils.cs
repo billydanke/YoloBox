@@ -11,7 +11,7 @@ namespace YoloBox.Classes
         public static System.Windows.Media.Color GetRandomColor()
         {
             Random rand = new Random(Guid.NewGuid().GetHashCode());
-            return System.Windows.Media.Color.FromRgb((byte)rand.Next(40, 255), (byte)rand.Next(40, 255), (byte)rand.Next(40, 255));
+            return System.Windows.Media.Color.FromRgb((byte)rand.Next(60, 255), (byte)rand.Next(60, 255), (byte)rand.Next(60, 255));
         }
     }
 }
