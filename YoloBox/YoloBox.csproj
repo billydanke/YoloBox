@@ -48,8 +48,4 @@
     <PackageReference Include="VirtualizingWrapPanel" Version="2.1.2" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Components\" />
-  </ItemGroup>
-
 </Project>

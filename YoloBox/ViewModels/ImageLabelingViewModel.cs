@@ -13,6 +13,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using YoloBox.Classes;
+using YoloBox.Components;
 using YoloBox.Models;
 using YoloBox.Views;
 
@@ -30,6 +31,7 @@ namespace YoloBox.ViewModels
         public ICommand DeleteLabelCommand { get; }
         public ICommand PreviousImageCommand { get; }
         public ICommand NextImageCommand { get; }
+        public ICommand SelectLabelCommand { get; }
 
         private string _currentImageFolderPath = "None";
         public string CurrentImageFolderPath
@@ -74,6 +76,20 @@ namespace YoloBox.ViewModels
         }
 
         public ObservableCollection<Class> Classes { get; set; } = new ObservableCollection<Class>();
+
+        private Label _selectedLabel;
+        public Label SelectedLabel
+        {
+            get => _selectedLabel;
+            set
+            {
+                if(_selectedLabel != value)
+                {
+                    _selectedLabel = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
         public ObservableCollection<Label> Labels { get; set; } = new ObservableCollection<Label>();
 
         private LabelImage _selectedLabelImage;
@@ -133,8 +149,28 @@ namespace YoloBox.ViewModels
                     Labels.Remove(label);
                 }
             });
+            SelectLabelCommand = new RelayCommand<Label>(label => 
+            {
+                SelectedLabel = label;
+            });
             NextImageCommand = new RelayCommand(_ => GoToNextImage());
             PreviousImageCommand = new RelayCommand(_ => GoToPreviousImage());
+        }
+
+        public static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
+        {
+            if (depObj == null) yield break;
+
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
+            {
+                DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
+
+                if (child is T t)
+                    yield return t;
+
+                foreach (T childOfChild in FindVisualChildren<T>(child))
+                    yield return childOfChild;
+            }
         }
 
         private void OpenImageFolder()
