@@ -21,7 +21,7 @@ namespace YoloBox.ViewModels
 {
     public class ImageLabelingViewModel : INotifyPropertyChanged
     {
-        private readonly Window _imageLabelingWindow;
+        private readonly ImageLabelingWindow _imageLabelingWindow;
 
         public ICommand OpenImageFolderCommand { get; }
         public ICommand SetLabelFolderCommand { get; }
@@ -244,7 +244,7 @@ namespace YoloBox.ViewModels
         }
         public ObservableCollection<LabelImage> ImageList { get; set; } = new ObservableCollection<LabelImage>();
 
-        public ImageLabelingViewModel(Window imageLabelingWindow)
+        public ImageLabelingViewModel(ImageLabelingWindow imageLabelingWindow)
         {
             _imageLabelingWindow = imageLabelingWindow;
 
@@ -464,14 +464,14 @@ namespace YoloBox.ViewModels
         private void OnLabelDragStart(MouseEventArgs? e)
         {
             if (!IsCreatingLabel || e == null || e.LeftButton != MouseButtonState.Pressed) return;
-            DragStart = e.GetPosition((IInputElement)e.Source);
+            DragStart = ClampPointToImage(e.GetPosition(_imageLabelingWindow.LabelImage));
             DragEnd = null;
         }
 
         private void OnLabelDragUpdate(MouseEventArgs? e)
         {
             if (!IsCreatingLabel || DragStart == null || e == null || e.LeftButton != MouseButtonState.Pressed) return;
-            DragEnd = e.GetPosition((IInputElement)e.Source);
+            DragEnd = ClampPointToImage(e.GetPosition(_imageLabelingWindow.LabelImage));
         }
 
         private void OnLabelDragFinish(MouseEventArgs? e)
@@ -502,6 +502,15 @@ namespace YoloBox.ViewModels
 
             DragStart = null;
             DragEnd = null;
+        }
+
+        private Point ClampPointToImage(Point p)
+        {
+            if (_imageLabelingWindow.LabelImage == null) return p;
+
+            double x = Math.Clamp(p.X, 0, _imageLabelingWindow.LabelImage.ActualWidth);
+            double y = Math.Clamp(p.Y, 0, _imageLabelingWindow.LabelImage.ActualHeight);
+            return new Point(x, y);
         }
 
         private void ReturnToMainMenu()

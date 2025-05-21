@@ -52,6 +52,8 @@ namespace YoloBox.Models
                     _color = value;
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(Brush)); // for UI binding convenience
+                    OnPropertyChanged(nameof(HoverBrush));
+                    OnPropertyChanged(nameof(GlowEffect));
                 }
             }
         }

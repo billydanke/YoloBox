@@ -26,6 +26,7 @@
     <Window.InputBindings>
         <KeyBinding Key="A" Command="{Binding PreviousImageCommand}" />
         <KeyBinding Key="D" Command="{Binding NextImageCommand}" />
+        <KeyBinding Key="Delete" Command="{Binding DeleteLabelCommand}" CommandParameter="{Binding SelectedLabel}" />
     </Window.InputBindings>
     
     <Grid>
@@ -49,24 +50,26 @@
             </MenuItem>
         </Menu>
 
-        <components:PanZoomBorder Grid.Column="1" Grid.Row="1" Grid.RowSpan="2" Margin="10" ClipToBounds="True">
+        <components:PanZoomBorder Grid.Column="1" Grid.Row="1" Grid.RowSpan="2" Margin="10" ClipToBounds="True" Background="Transparent">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                    <classes:PassEventArgsToCommand Command="{Binding StartLabelDragCommand}" />
+                </i:EventTrigger>
+                <i:EventTrigger EventName="PreviewMouseMove">
+                    <classes:PassEventArgsToCommand Command="{Binding UpdateLabelDragCommand}" />
+                </i:EventTrigger>
+                <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                    <classes:PassEventArgsToCommand Command="{Binding FinishLabelDragCommand}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+
             <Grid Grid.Column="1" Grid.Row="1" Grid.RowSpan="2">
                 <Grid.InputBindings>
                     <MouseBinding Gesture="LeftClick" Command="{Binding SelectLabelCommand}" CommandParameter="{x:Null}" />
                 </Grid.InputBindings>
 
                 <Image x:Name="LabelImage" Stretch="Uniform" Source="{Binding SelectedLabelImage.Image}">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="MouseDown">
-                            <classes:PassEventArgsToCommand Command="{Binding StartLabelDragCommand}" />
-                        </i:EventTrigger>
-                        <i:EventTrigger EventName="MouseMove">
-                            <classes:PassEventArgsToCommand Command="{Binding UpdateLabelDragCommand}" />
-                        </i:EventTrigger>
-                        <i:EventTrigger EventName="MouseUp">
-                            <classes:PassEventArgsToCommand Command="{Binding FinishLabelDragCommand}" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
+                    
                 </Image>
 
                 <ItemsControl ItemsSource="{Binding Labels}">

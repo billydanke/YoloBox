@@ -18,7 +18,7 @@
             <Setter Property="OverridesDefaultStyle" Value="True" />
             <Setter Property="Width" Value="10"/>
             <Setter Property="Height" Value="10"/>
-            <Setter Property="Background" Value="{Binding ClassBrush}"/>
+            <Setter Property="Background" Value="{Binding Class.Brush}"/>
             <Setter Property="BorderBrush" Value="White"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Template">
@@ -60,7 +60,7 @@
         
         <!-- Border -->
         <Border x:Name="LabelBorder"
-                BorderBrush="{Binding ClassBrush}"
+                BorderBrush="{Binding Class.Brush}"
                 BorderThickness="1.5">
             <Border.Style>
                 <Style TargetType="Border">
@@ -73,7 +73,7 @@
                                     <Binding Path="DataContext.SelectedLabel" RelativeSource="{RelativeSource AncestorType=Window}" />
                                 </MultiBinding>
                             </DataTrigger.Binding>
-                            <Setter Property="Background" Value="{Binding SemiTransparentBrush}"/>
+                            <Setter Property="Background" Value="{Binding Class.HoverBrush}"/>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
