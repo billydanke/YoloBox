@@ -32,6 +32,9 @@ namespace YoloBox.ViewModels
         public ICommand PreviousImageCommand { get; }
         public ICommand NextImageCommand { get; }
         public ICommand SelectLabelCommand { get; }
+        public ICommand StartLabelDragCommand { get; }
+        public ICommand UpdateLabelDragCommand { get; }
+        public ICommand FinishLabelDragCommand { get; }
 
         private string _currentImageFolderPath = "None";
         public string CurrentImageFolderPath
@@ -61,6 +64,78 @@ namespace YoloBox.ViewModels
             }
         }
 
+        private bool _isCreatingLabel;
+        public bool IsCreatingLabel
+        {
+            get => _isCreatingLabel;
+            set
+            {
+                if (_isCreatingLabel != value)
+                {
+                    _isCreatingLabel = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private Point? _dragStart;
+        public Point? DragStart
+        {
+            get => _dragStart;
+            set
+            {
+                if (_dragStart != value)
+                {
+                    _dragStart = value;
+                    OnPropertyChanged();
+                }
+
+                if (value != null)
+                {
+                    foreach (Label label in Labels)
+                    {
+                        label.IsSelectable = false;
+                    }
+                }
+                else
+                {
+                    foreach (Label label in Labels)
+                    {
+                        label.IsSelectable = true;
+                    }
+                }
+            }
+        }
+
+        private Point? _dragEnd;
+        public Point? DragEnd
+        {
+            get => _dragEnd;
+            set
+            {
+                if (_dragEnd != value)
+                {
+                    _dragEnd = value;
+                    OnPropertyChanged();
+                }
+
+                if (value != null)
+                {
+                    foreach (Label label in Labels)
+                    {
+                        label.IsSelectable = false;
+                    }
+                }
+                else
+                {
+                    foreach (Label label in Labels)
+                    {
+                        label.IsSelectable = true;
+                    }
+                }
+            }
+        }
+
         private Class _selectedClass;
         public Class SelectedClass
         {
@@ -71,6 +146,18 @@ namespace YoloBox.ViewModels
                 {
                     _selectedClass = value;
                     OnPropertyChanged();
+
+                    // Deselect labels and get ready to make a new label if the selected class isn't null.
+
+                    if(value != null)
+                    {
+                        SelectedLabel = null;
+                        IsCreatingLabel = true;
+                    }
+                    else
+                    {
+                        IsCreatingLabel = false;
+                    }
                 }
             }
         }
@@ -87,6 +174,30 @@ namespace YoloBox.ViewModels
                 {
                     _selectedLabel = value;
                     OnPropertyChanged();
+
+                    if(value != null)
+                    {
+                        SelectedClass = null;
+
+                        foreach (Label label in Labels)
+                        {
+                            if (label != value)
+                            {
+                                label.IsSelectable = false;
+                            }
+                            else
+                            {
+                                label.IsSelectable = true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach (Label label in Labels)
+                        {
+                            label.IsSelectable = true;
+                        }
+                    }
                 }
             }
         }
@@ -155,22 +266,9 @@ namespace YoloBox.ViewModels
             });
             NextImageCommand = new RelayCommand(_ => GoToNextImage());
             PreviousImageCommand = new RelayCommand(_ => GoToPreviousImage());
-        }
-
-        public static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
-        {
-            if (depObj == null) yield break;
-
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
-            {
-                DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
-
-                if (child is T t)
-                    yield return t;
-
-                foreach (T childOfChild in FindVisualChildren<T>(child))
-                    yield return childOfChild;
-            }
+            StartLabelDragCommand = new RelayCommand<MouseEventArgs>(OnLabelDragStart);
+            UpdateLabelDragCommand = new RelayCommand<MouseEventArgs>(OnLabelDragUpdate);
+            FinishLabelDragCommand = new RelayCommand<MouseEventArgs>(OnLabelDragFinish);
         }
 
         private void OpenImageFolder()
@@ -361,6 +459,49 @@ namespace YoloBox.ViewModels
             {
                 SelectedLabelImage = ImageList[index - 1];
             }
+        }
+
+        private void OnLabelDragStart(MouseEventArgs? e)
+        {
+            if (!IsCreatingLabel || e == null || e.LeftButton != MouseButtonState.Pressed) return;
+            DragStart = e.GetPosition((IInputElement)e.Source);
+            DragEnd = null;
+        }
+
+        private void OnLabelDragUpdate(MouseEventArgs? e)
+        {
+            if (!IsCreatingLabel || DragStart == null || e == null || e.LeftButton != MouseButtonState.Pressed) return;
+            DragEnd = e.GetPosition((IInputElement)e.Source);
+        }
+
+        private void OnLabelDragFinish(MouseEventArgs? e)
+        {
+            if (!IsCreatingLabel || e == null || DragStart == null || DragEnd == null) return;
+
+            var start = DragStart.Value;
+            var end = DragEnd.Value;
+
+            double x1 = Math.Min(start.X, end.X);
+            double x2 = Math.Max(start.X, end.X);
+            double y1 = Math.Min(start.Y, end.Y);
+            double y2 = Math.Max(start.Y, end.Y);
+
+            var image = e.Source as FrameworkElement;
+            double width = image?.ActualWidth ?? 1;
+            double height = image?.ActualHeight ?? 1;
+
+            double normX = ((x1 + x2) / 2) / width;
+            double normY = ((y1 + y2) / 2) / height;
+            double normW = (x2 - x1) / width;
+            double normH = (y2 - y1) / height;
+
+            if (SelectedClass != null && normW > 0.01 && normH > 0.01)
+            {
+                Labels.Add(new Label(SelectedClass, normX, normY, normW, normH));
+            }
+
+            DragStart = null;
+            DragEnd = null;
         }
 
         private void ReturnToMainMenu()

@@ -18,6 +18,20 @@ namespace YoloBox.Models
         public Color ClassColor => Class?.Color ?? Colors.White;
         public Brush SemiTransparentBrush => new SolidColorBrush(Color.FromArgb(50, ClassColor.R, ClassColor.G, ClassColor.B));
 
+        private bool _isSelectable = true;
+        public bool IsSelectable
+        {
+            get => _isSelectable;
+            set
+            {
+                if(_isSelectable != value)
+                {
+                    _isSelectable = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private double _centerX;
         public double CenterX
         {

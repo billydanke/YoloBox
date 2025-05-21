@@ -78,11 +78,33 @@ namespace YoloBox.Components
             double pixelLeft = pixelCenterX - pixelWidth / 2;
             double pixelTop = pixelCenterY - pixelHeight / 2;
 
-            if (left) pixelLeft += dx;
-            if (top) pixelTop += dy;
+            const double MinSize = 10;
 
-            pixelWidth = Math.Max(10, pixelWidth + (left ? -dx : dx));
-            pixelHeight = Math.Max(10, pixelHeight + (top ? -dy : dy));
+            if (left)
+            {
+                double newLeft = pixelLeft + dx;
+                double maxLeft = pixelLeft + pixelWidth - MinSize;
+                newLeft = Math.Min(newLeft, maxLeft); // Prevent overlap
+                pixelWidth = pixelLeft + pixelWidth - newLeft;
+                pixelLeft = newLeft;
+            }
+            else
+            {
+                pixelWidth = Math.Max(MinSize, pixelWidth + dx);
+            }
+
+            if (top)
+            {
+                double newTop = pixelTop + dy;
+                double maxTop = pixelTop + pixelHeight - MinSize;
+                newTop = Math.Min(newTop, maxTop); // Prevent overlap
+                pixelHeight = pixelTop + pixelHeight - newTop;
+                pixelTop = newTop;
+            }
+            else
+            {
+                pixelHeight = Math.Max(MinSize, pixelHeight + dy);
+            }
 
             pixelLeft = Math.Max(0, pixelLeft);
             pixelTop = Math.Max(0, pixelTop);
@@ -101,10 +123,10 @@ namespace YoloBox.Components
             Label.Width = Math.Clamp(pixelWidth / ImageWidth, 0, 1);
             Label.Height = Math.Clamp(pixelHeight / ImageHeight, 0, 1);
 
-            // Set new pixel dimensions for immediate visual feedback
             Width = pixelWidth;
             Height = pixelHeight;
         }
+
 
         // Thumb Drag Events
         private void TopLeftThumb_DragDelta(object s, DragDeltaEventArgs e) => ApplySizeChange(e.HorizontalChange, e.VerticalChange, true, true);

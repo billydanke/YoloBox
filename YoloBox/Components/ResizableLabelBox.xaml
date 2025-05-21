@@ -7,6 +7,7 @@
              xmlns:converters="clr-namespace:YoloBox.Converters"
              mc:Ignorable="d" 
              Width="Auto" Height="Auto"
+             IsHitTestVisible="{Binding IsSelectable}"
              x:Name="Root">
 
     <UserControl.Resources>
@@ -49,7 +50,7 @@
                             <Binding Path="DataContext.SelectedLabel" RelativeSource="{RelativeSource AncestorType=Window}" />
                         </MultiBinding>
                     </DataTrigger.Binding>
-                    <Setter Property="Panel.ZIndex" Value="1"/>
+                    <Setter Property="Panel.ZIndex" Value="999"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>

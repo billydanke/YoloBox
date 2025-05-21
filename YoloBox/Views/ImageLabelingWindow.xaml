@@ -3,9 +3,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:local="clr-namespace:YoloBox.Views"
         xmlns:components="clr-namespace:YoloBox.Components"
         xmlns:converters="clr-namespace:YoloBox.Converters"
+        xmlns:classes="clr-namespace:YoloBox.Classes"
         mc:Ignorable="d"
         Title="YoloBox - Image Labeling"
         Background="#202020"
@@ -15,6 +17,10 @@
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <converters:CenterToLeftConverter x:Key="CenterToLeftConverter" />
         <converters:CenterToTopConverter x:Key="CenterToTopConverter" />
+        <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+        <converters:DragWidthConverter x:Key="DragWidthConverter" />
+        <converters:DragHeightConverter x:Key="DragHeightConverter" />
+        <converters:MinValueConverter x:Key="MinValueConverter" />
     </Window.Resources>
 
     <Window.InputBindings>
@@ -43,51 +49,97 @@
             </MenuItem>
         </Menu>
 
-        <Grid Grid.Column="1" Grid.Row="1" Grid.RowSpan="2" Margin="10">
-            <Grid.InputBindings>
-                <MouseBinding Gesture="LeftClick" Command="{Binding SelectLabelCommand}" CommandParameter="{x:Null}" />
-            </Grid.InputBindings>
-            
-            <Image x:Name="LabelImage" Stretch="Uniform" Source="{Binding SelectedLabelImage.Image}" />
+        <components:PanZoomBorder Grid.Column="1" Grid.Row="1" Grid.RowSpan="2" Margin="10" ClipToBounds="True">
+            <Grid Grid.Column="1" Grid.Row="1" Grid.RowSpan="2">
+                <Grid.InputBindings>
+                    <MouseBinding Gesture="LeftClick" Command="{Binding SelectLabelCommand}" CommandParameter="{x:Null}" />
+                </Grid.InputBindings>
 
-            <ItemsControl ItemsSource="{Binding Labels}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <Canvas Width="{Binding ActualWidth, ElementName=LabelImage}" Height="{Binding ActualHeight, ElementName=LabelImage}" IsItemsHost="True" ClipToBounds="True" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
+                <Image x:Name="LabelImage" Stretch="Uniform" Source="{Binding SelectedLabelImage.Image}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseDown">
+                            <classes:PassEventArgsToCommand Command="{Binding StartLabelDragCommand}" />
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="MouseMove">
+                            <classes:PassEventArgsToCommand Command="{Binding UpdateLabelDragCommand}" />
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="MouseUp">
+                            <classes:PassEventArgsToCommand Command="{Binding FinishLabelDragCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </Image>
 
-                <ItemsControl.ItemContainerStyle>
-                    <Style TargetType="ContentPresenter">
-                        <Setter Property="Canvas.Left">
-                            <Setter.Value>
-                                <MultiBinding Converter="{StaticResource CenterToLeftConverter}">
-                                    <Binding Path="CenterX"/>
-                                    <Binding Path="Width"/>
-                                    <Binding ElementName="LabelImage" Path="ActualWidth"/>
-                                </MultiBinding>
-                            </Setter.Value>
-                        </Setter>
-                        <Setter Property="Canvas.Top">
-                            <Setter.Value>
-                                <MultiBinding Converter="{StaticResource CenterToTopConverter}">
-                                    <Binding Path="CenterY"/>
-                                    <Binding Path="Height"/>
-                                    <Binding ElementName="LabelImage" Path="ActualHeight"/>
-                                </MultiBinding>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </ItemsControl.ItemContainerStyle>
+                <ItemsControl ItemsSource="{Binding Labels}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas Width="{Binding ActualWidth, ElementName=LabelImage}" Height="{Binding ActualHeight, ElementName=LabelImage}" IsItemsHost="True" ClipToBounds="True" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
 
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <components:ResizableLabelBox ImageWidth="{Binding ElementName=LabelImage, Path=ActualWidth}" ImageHeight="{Binding ElementName=LabelImage, Path=ActualHeight}" />
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="ContentPresenter">
+                            <Setter Property="Canvas.Left">
+                                <Setter.Value>
+                                    <MultiBinding Converter="{StaticResource CenterToLeftConverter}">
+                                        <Binding Path="CenterX"/>
+                                        <Binding Path="Width"/>
+                                        <Binding ElementName="LabelImage" Path="ActualWidth"/>
+                                    </MultiBinding>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Canvas.Top">
+                                <Setter.Value>
+                                    <MultiBinding Converter="{StaticResource CenterToTopConverter}">
+                                        <Binding Path="CenterY"/>
+                                        <Binding Path="Height"/>
+                                        <Binding ElementName="LabelImage" Path="ActualHeight"/>
+                                    </MultiBinding>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
 
-        </Grid>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <components:ResizableLabelBox ImageWidth="{Binding ElementName=LabelImage, Path=ActualWidth}" ImageHeight="{Binding ElementName=LabelImage, Path=ActualHeight}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <Canvas IsHitTestVisible="False" Width="{Binding ActualWidth, ElementName=LabelImage}" Height="{Binding ActualHeight, ElementName=LabelImage}">
+                    <Rectangle Stroke="White" StrokeDashArray="4 2" StrokeThickness="1" Visibility="{Binding DragStart, Converter={StaticResource NullToVisibilityConverter}}">
+                        <Canvas.Left>
+                            <MultiBinding Converter="{StaticResource MinValueConverter}">
+                                <Binding Path="DragStart.X"/>
+                                <Binding Path="DragEnd.X"/>
+                            </MultiBinding>
+                        </Canvas.Left>
+                        <Canvas.Top>
+                            <MultiBinding Converter="{StaticResource MinValueConverter}">
+                                <Binding Path="DragStart.Y"/>
+                                <Binding Path="DragEnd.Y"/>
+                            </MultiBinding>
+                        </Canvas.Top>
+
+                        <Rectangle.Width>
+                            <MultiBinding Converter="{StaticResource DragWidthConverter}">
+                                <Binding Path="DragStart.X"/>
+                                <Binding Path="DragEnd.X"/>
+                            </MultiBinding>
+                        </Rectangle.Width>
+                        <Rectangle.Height>
+                            <MultiBinding Converter="{StaticResource DragHeightConverter}">
+                                <Binding Path="DragStart.Y"/>
+                                <Binding Path="DragEnd.Y"/>
+                            </MultiBinding>
+                        </Rectangle.Height>
+                    </Rectangle>
+                </Canvas>
+
+            </Grid>
+        </components:PanZoomBorder>
+        
+        
 
         <Border Grid.Row="1" Grid.RowSpan="2" Background="#303030" BorderBrush="Gray" BorderThickness="1 1 1 0">
             <Grid>
