@@ -237,12 +237,59 @@ namespace YoloBox.ViewModels
                     {
                         MessageBox.Show($"Failed to load labels: {ex.Message}", "Label Loading Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
+
+                    if (_selectedLabelImage != null)
+                    {
+                        _imageLabelingWindow.ImagesListBox.ScrollIntoView(_selectedLabelImage);
+                    }
                     
                     OnPropertyChanged();
                 }
             }
         }
         public ObservableCollection<LabelImage> ImageList { get; set; } = new ObservableCollection<LabelImage>();
+
+        private int _totalImages = 0;
+        public int TotalImages
+        {
+            get => _totalImages;
+            set
+            {
+                if(_totalImages != value)
+                {
+                    _totalImages = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(CompletionPercentage));
+                }
+            }
+        }
+
+        private int _totalSeenImages = 0;
+        public int TotalSeenImages
+        {
+            get => _totalSeenImages;
+            set
+            {
+                if(_totalSeenImages != value)
+                {
+                    _totalSeenImages = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(CompletionPercentage));
+                }
+            }
+        }
+
+        public double CompletionPercentage
+        {
+            get
+            {
+                if(TotalImages != 0)
+                {
+                    return (double)TotalSeenImages / TotalImages * 100.0;
+                }
+                return 0;
+            }
+        }
 
         public ImageLabelingViewModel(ImageLabelingWindow imageLabelingWindow)
         {
@@ -290,8 +337,11 @@ namespace YoloBox.ViewModels
                 foreach (string imagePath in imagePaths)
                 {
                     LabelImage labelImage = new LabelImage(imagePath);
+                    labelImage.PropertyChanged += LabelImage_PropertyChanged;
                     ImageList.Add(labelImage);
                 }
+
+                TotalImages = ImageList.Count;
             }
 
             if(string.IsNullOrEmpty(CurrentLabelFolderPath))
@@ -458,6 +508,19 @@ namespace YoloBox.ViewModels
             if (index > 0)
             {
                 SelectedLabelImage = ImageList[index - 1];
+            }
+        }
+
+        private void LabelImage_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if(e.PropertyName == nameof(LabelImage.IsSeen))
+            {
+                LabelImage? image = sender as LabelImage;
+                if(image != null)
+                {
+                    if (image.IsSeen) TotalSeenImages++;
+                    else TotalSeenImages--;
+                }
             }
         }
 
