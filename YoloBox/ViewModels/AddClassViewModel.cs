@@ -12,15 +12,17 @@ using System.Windows.Input;
 using System.Windows.Media;
 using YoloBox.Classes;
 using YoloBox.Models;
+using YoloBox.Views;
 
 namespace YoloBox.ViewModels
 {
     public class AddClassViewModel : INotifyPropertyChanged
     {
-        private readonly Window _addClassWindow;
+        private readonly AddClassWindow _addClassWindow;
 
         public ICommand SaveClassesCommand { get; }
         public ICommand CancelCommand { get; }
+        public ICommand ResetHotKeyCommand { get; }
 
         private string _windowTitle = "Add Class";
         public string WindowTitle
@@ -98,14 +100,30 @@ namespace YoloBox.ViewModels
             {
                 if (_hotkey != value)
                 {
+
+                    if(value != Key.None)
+                    {
+                        bool isInUse = Classes.Any(c => c.ClassId != ClassId && c.HotKey == value) == true;
+
+                        if (isInUse)
+                        {
+                            MessageBox.Show($"The key '{value}' is already assigned to another class! Please try again with a different hotkey.", "Duplicate Key", MessageBoxButton.OK, MessageBoxImage.Warning);
+                            return;
+                        }
+                    }
+                    
                     _hotkey = value;
                     OnPropertyChanged();
+                    OnPropertyChanged(nameof(HasHotkey));
                 }
             }
         }
 
+        public bool HasHotkey => HotKey == Key.None ? false : true;
 
-        public AddClassViewModel(Window addClassWindow, string labelFolderPath, ObservableCollection<Class> classes, int classId = -1)
+        public IEnumerable<Key> AllowedKeys => new[] { Key.None }.Concat(KeyManager.AllowedKeys);
+
+        public AddClassViewModel(AddClassWindow addClassWindow, string labelFolderPath, ObservableCollection<Class> classes, int classId = -1)
         {
             _addClassWindow = addClassWindow;
             ClassesFilePath = Path.Join(labelFolderPath, "Classes.txt");
@@ -123,10 +141,12 @@ namespace YoloBox.ViewModels
                 WindowTitle = $"Edit Class - {existingClass.Name}";
                 Color = existingClass.Color;
                 ClassName = existingClass.Name;
+                HotKey = existingClass.HotKey;
             }
 
             SaveClassesCommand = new RelayCommand(_ => SaveClass());
             CancelCommand = new RelayCommand(_ => _addClassWindow.Close());
+            ResetHotKeyCommand = new RelayCommand(_ => ResetHotKey());
         }
 
         private void SaveClass()
@@ -136,10 +156,11 @@ namespace YoloBox.ViewModels
             {
                 existingClass.Name = ClassName;
                 existingClass.Color = Color;
+                existingClass.HotKey = HotKey;
             }
             else
             {
-                Classes.Add(new Class(ClassId, ClassName, Color));
+                Classes.Add(new Class(ClassId, ClassName, Color, HotKey));
             }
 
             RewriteClassesFile();
@@ -156,6 +177,11 @@ namespace YoloBox.ViewModels
             IEnumerable<string> lines = orderedClasses.Select(c => c.Name);
 
             File.WriteAllLines(ClassesFilePath, lines);
+        }
+
+        private void ResetHotKey()
+        {
+            HotKey = Key.None;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:YoloBox.Views"
+        xmlns:converters="clr-namespace:YoloBox.Converters"
         mc:Ignorable="d"
         Title="{Binding WindowTitle}"
         Background="#303030"
@@ -11,8 +12,13 @@
         ResizeMode="NoResize"
         Height="335" Width="300">
 
+    <Window.Resources>
+        <converters:KeyToStringConverter x:Key="KeyToStringConverter" />
+    </Window.Resources>
+    
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition />
             <RowDefinition Height="Auto" />
@@ -22,12 +28,33 @@
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
-        <StackPanel Grid.ColumnSpan="2" Orientation="Vertical" HorizontalAlignment="Stretch" Margin="10">
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Margin="10">
             <TextBlock Text="Class Name" Foreground="White" />
             <TextBox Text="{Binding ClassName, Mode=TwoWay}" Height="24" Background="#404040" BorderBrush="#808080" VerticalContentAlignment="Center" Foreground="White" Padding="5 0" />
         </StackPanel>
 
-        <Grid Grid.Row="1">
+        <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Stretch" Margin="10">
+            <TextBlock Text="Key Binding" Foreground="White" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <ComboBox ItemsSource="{Binding AllowedKeys}" SelectedItem="{Binding HotKey}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource KeyToStringConverter}}">
+                            </TextBlock>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <Button Grid.Column="1" Content="_Unset" IsEnabled="{Binding HasHotkey}" Height="24" Margin="5 0 0 0" Command="{Binding ResetHotKeyCommand}" />
+
+            </Grid>
+        </StackPanel>
+
+        <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />
@@ -49,9 +76,9 @@
 
         </Grid>
 
-        <Border Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10" BorderBrush="Black" BorderThickness="1" CornerRadius="4" Background="{Binding Brush}" />
+        <Border Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10" BorderBrush="Black" BorderThickness="1" CornerRadius="4" Background="{Binding Brush}" />
 
-        <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="5 3">
+        <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="5 3">
             <Button Content="_Cancel" Width="70" Margin="0 0 3 0" Command="{Binding CancelCommand}" />
             <Button Content="_Save" Width="70" Margin="3 0 0 0" Command="{Binding SaveClassesCommand}" />
         </StackPanel>

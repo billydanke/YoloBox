@@ -11,6 +11,7 @@
         mc:Ignorable="d"
         Title="YoloBox - Image Labeling"
         Background="#202020"
+        PreviewKeyDown="Window_PreviewKeyDown"
         Height="550" MinHeight="550" Width="900" MinWidth="900" WindowState="Maximized">
 
     <Window.Resources>
@@ -21,6 +22,7 @@
         <converters:DragWidthConverter x:Key="DragWidthConverter" />
         <converters:DragHeightConverter x:Key="DragHeightConverter" />
         <converters:MinValueConverter x:Key="MinValueConverter" />
+        <converters:KeyToStringConverter x:Key="KeyToStringConverter" />
     </Window.Resources>
 
     <Window.InputBindings>
@@ -231,8 +233,8 @@
                                 <Border.InputBindings>
                                     <MouseBinding Gesture="RightClick" Command="{Binding DataContext.EditClassCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" />
                                 </Border.InputBindings>
-                                
-                                <TextBlock x:Name="TagText" Text="{Binding Name}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{Binding Brush}" FontWeight="SemiBold">
+
+                                <TextBlock x:Name="TagText" Text="{Binding DisplayName}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{Binding Brush}" FontWeight="SemiBold">
                                     <TextBlock.Effect>
                                         <DropShadowEffect Color="Black" BlurRadius="4" ShadowDepth="0" Opacity="1" />
                                     </TextBlock.Effect>

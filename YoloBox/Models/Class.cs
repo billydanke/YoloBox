@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
+using YoloBox.Converters;
 
 namespace YoloBox.Models
 {
@@ -37,9 +38,12 @@ namespace YoloBox.Models
                 {
                     _name = value;
                     OnPropertyChanged();
+                    OnPropertyChanged(nameof(DisplayName));
                 }
             }
         }
+
+        public string DisplayName => HotKey == Key.None ? Name : $"({KeyToStringConverter.CreateFormattedString(HotKey)}) {Name}";
 
         private Color _color;
         public Color Color
@@ -68,6 +72,7 @@ namespace YoloBox.Models
                 {
                     _hotkey = value;
                     OnPropertyChanged();
+                    OnPropertyChanged(nameof(DisplayName));
                 }
             }
         }
@@ -83,11 +88,12 @@ namespace YoloBox.Models
             Opacity = 0.25
         };
 
-        public Class(int classId, string name, Color color)
+        public Class(int classId, string name, Color color, Key hotKey = Key.None)
         {
             ClassId = classId;
             Name = name;
             Color = color;
+            HotKey = hotKey;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
