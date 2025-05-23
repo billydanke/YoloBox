@@ -35,11 +35,14 @@ YoloBox is a powerful WPF-based YOLO image labeling tool designed for object det
 
 ## 📸 Screenshots
 
+### Main Menu
+<img src="YoloBox/Resources/screenshots/MainMenu.png" alt="Data Validation Window Screenshot"/>
+
 ### Image Validation on Coco128 Dataset
-<img src="YoloBox/Resources/Screenshots/DataValidationWindow.png" alt="Data Validation Window Screenshot"/>
+<img src="YoloBox/Resources/screenshots/DataValidationWindow.png" alt="Data Validation Window Screenshot"/>
 
 ### Image Labeling on Coco128 Dataset
-<img src="YoloBox/Resources/Screenshots/LabelingWindow.png" alt="Data Validation Window Screenshot"/>
+<img src="YoloBox/Resources/screenshots/LabelingWindow.png" alt="Data Validation Window Screenshot"/>
 
 ## 🤝 Contributing
 Pull requests are welcome! I'm not going to pretend to be the best WPF developer, so if you find anything you would like to change or fix feel free, and maybe it will end up in the master branch. For major changes, please open an issue first to discuss what you'd like to change.
